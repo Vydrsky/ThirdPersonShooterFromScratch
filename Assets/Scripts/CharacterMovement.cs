@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class CharacterMovement : MonoBehaviour {
 
@@ -14,6 +15,7 @@ public class CharacterMovement : MonoBehaviour {
     private Vector3 input;
     private Vector3 moveDir;
     private Camera mainCamera;
+    [SerializeField] private Rig aimLayer;
     private float runSpeed;
     private float walkSpeed;
     private float sprintSpeed;
@@ -26,8 +28,12 @@ public class CharacterMovement : MonoBehaviour {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float moveRigidbodiesForceAmplification = 10f;
     [SerializeField]private float animationSwitchSpeed = 3f;
+    [SerializeField] private float aimDuration = 0.3f;
     [SerializeField] private KeyCode walkButton = KeyCode.LeftAlt;
     [SerializeField] private KeyCode sprintButton = KeyCode.LeftShift;
+
+    public Transform origin;
+    public Transform target;
 
     /************************ INITIALIZE ************************/
     private void Awake() {
@@ -47,6 +53,16 @@ public class CharacterMovement : MonoBehaviour {
 
     /************************ LOOPING ************************/
     private void Update() {
+
+        if (Input.GetMouseButton(1)) {
+            aimLayer.weight += Time.deltaTime / aimDuration;
+        }
+        else {
+            aimLayer.weight -= Time.deltaTime / aimDuration;
+        }
+
+        float cameraYRot = mainCamera.transform.rotation.eulerAngles.y;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, cameraYRot, 0f), turnSpeed * Time.deltaTime);
         input.x = Input.GetAxisRaw("Horizontal");
         input.z = Input.GetAxisRaw("Vertical");
 
@@ -62,11 +78,8 @@ public class CharacterMovement : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        float cameraYRot = mainCamera.transform.rotation.eulerAngles.y;
-        if (input.sqrMagnitude > 0.1f) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, cameraYRot, 0f), turnSpeed * Time.fixedDeltaTime);
-            characterController.Move(moveDir * moveSpeed * Time.fixedDeltaTime);
-        }
+        
+        characterController.Move(moveDir * moveSpeed * Time.fixedDeltaTime);
         characterController.Move(Vector3.down * Time.fixedDeltaTime);
     }
 
