@@ -54,11 +54,11 @@ public class CharacterMovement : MonoBehaviour {
     /************************ LOOPING ************************/
     private void Update() {
 
-        if (Input.GetMouseButton(1)) {
-            aimLayer.weight += Time.deltaTime / aimDuration;
+        if (movementState == MovementState.Sprint) {
+            aimLayer.weight -= Time.deltaTime / aimDuration;
         }
         else {
-            aimLayer.weight -= Time.deltaTime / aimDuration;
+            aimLayer.weight += Time.deltaTime / aimDuration;
         }
 
         float cameraYRot = mainCamera.transform.rotation.eulerAngles.y;
