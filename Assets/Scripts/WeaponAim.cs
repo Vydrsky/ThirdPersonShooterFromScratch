@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class WeaponAim : MonoBehaviour {
 
@@ -6,19 +7,14 @@ public class WeaponAim : MonoBehaviour {
 
     [SerializeField] private Transform target;
     [SerializeField] private Transform weaponPivot;
+    [SerializeField] private Rig aimRig;
     
     /************************ INITIALIZE ************************/
-    private void Awake() {
-        
-    }
-
-    private void Start() {
-        
-    }
 
     /************************ LOOPING ************************/
     private void Update() {
-        transform.rotation = Quaternion.LookRotation(target.position - weaponPivot.position, Vector3.up);
+        if(aimRig.weight>0)
+            transform.rotation = Quaternion.LookRotation(target.position - weaponPivot.position, Vector3.up);
     }
 
     /************************ METHODS ************************/

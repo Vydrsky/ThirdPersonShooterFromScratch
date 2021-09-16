@@ -9,103 +9,86 @@ public class CharacterMovement : MonoBehaviour {
     private const float RUN_ANIMATION_EDGE_VALUE = 2f;
     private const float SPRINT_ANIMATION_EDGE_VALUE = 3f;
 
-
+    private float moveSpeed;
     private Animator animator;
     private CharacterController characterController;
     private Vector3 input;
     private Vector3 moveDir;
     private Camera mainCamera;
-    [SerializeField] private Rig aimLayer;
-    private float runSpeed;
-    private float walkSpeed;
-    private float sprintSpeed;
     private float animationX;
     private float animationZ;
-    private MovementState movementState;
-    private Vector3 characterVelocity;
-    private Vector3 lastFramePosition;
-    [SerializeField] private float turnSpeed = 15f;
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float moveRigidbodiesForceAmplification = 10f;
-    [SerializeField]private float animationSwitchSpeed = 3f;
-    [SerializeField] private float aimDuration = 0.3f;
-    [SerializeField] private KeyCode walkButton = KeyCode.LeftAlt;
-    [SerializeField] private KeyCode sprintButton = KeyCode.LeftShift;
-
-    public Transform origin;
-    public Transform target;
+    private MovementState movementState = MovementState.Run;
+    [SerializeField] private PlayerMovementDataSO playerMovementData;
+    [SerializeField] private Rig aimLayer;
 
     /************************ INITIALIZE ************************/
     private void Awake() {
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         mainCamera = Camera.main;
-        runSpeed = moveSpeed;
-        sprintSpeed = runSpeed * 1.5f;
-        walkSpeed = runSpeed * 0.5f;
+        moveSpeed = playerMovementData.runSpeed;
     }
 
     private void Start() {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        movementState = MovementState.Run;
     }
 
     /************************ LOOPING ************************/
     private void Update() {
-
-        if (movementState == MovementState.Sprint) {
-            aimLayer.weight -= Time.deltaTime / aimDuration;
-        }
-        else {
-            aimLayer.weight += Time.deltaTime / aimDuration;
-        }
+        HandleAimRigSwitching();
 
         float cameraYRot = mainCamera.transform.rotation.eulerAngles.y;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, cameraYRot, 0f), turnSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, cameraYRot, 0f), playerMovementData.turnSpeed * Time.deltaTime);
+
         input.x = Input.GetAxisRaw("Horizontal");
         input.z = Input.GetAxisRaw("Vertical");
 
-        SetState();
+        SetMovementState();
         ControlAnimator();
         moveDir = (transform.forward * input.z + transform.right * input.x).normalized;
-
-        characterVelocity.x = transform.position.x - lastFramePosition.x;
-        characterVelocity.y = transform.position.x - lastFramePosition.y;
-        characterVelocity.y = transform.position.y - lastFramePosition.y;
-
-        lastFramePosition = transform.position;
+        
     }
 
+
     private void FixedUpdate() {
-        
-        characterController.Move(moveDir * moveSpeed * Time.fixedDeltaTime);
-        characterController.Move(Vector3.down * Time.fixedDeltaTime);
+        characterController.Move(moveDir * moveSpeed * Time.deltaTime + playerMovementData.gravityVector * Time.deltaTime);
+        characterController.Move(Vector3.down * Time.deltaTime);
     }
 
     /************************ METHODS ************************/
     private void OnControllerColliderHit(ControllerColliderHit hit) {
         if (hit.rigidbody == null) return;
         Vector3 pushDir = hit.transform.position - transform.position;
-        hit.rigidbody.AddForce(pushDir * moveRigidbodiesForceAmplification * Time.fixedDeltaTime, ForceMode.Impulse);
+        hit.rigidbody.AddForce(pushDir * playerMovementData.moveRigidbodiesForceAmplification * Time.deltaTime, ForceMode.Impulse);
     }
 
-    private void SetState() {
-        if (Input.GetKey(walkButton) && characterController.isGrounded) {
+    private void HandleAimRigSwitching() {
+        if (movementState == MovementState.Sprint) {
+            aimLayer.weight -= Time.deltaTime / playerMovementData.aimDuration;
+        }
+        else {
+            aimLayer.weight += Time.deltaTime / playerMovementData.aimDuration;
+        }
+    }
+
+    private void SetMovementState() {
+        if (Input.GetKey(playerMovementData.walkButton) && playerMovementData.isGrounded) {
             movementState = MovementState.Walk;
-            moveSpeed = walkSpeed;
+            moveSpeed = playerMovementData.walkSpeed;
         }
-        else if (Input.GetKey(sprintButton) && Input.GetKey(KeyCode.W) && characterController.isGrounded && animationZ >=2f) {
+        else if (Input.GetKey(playerMovementData.sprintButton) && Input.GetKey(playerMovementData.forwardButton) && playerMovementData.isGrounded && animationZ >= RUN_ANIMATION_EDGE_VALUE) {
             movementState = MovementState.Sprint;
-            moveSpeed = sprintSpeed;
+            moveSpeed = playerMovementData.sprintSpeed;
         }
-        else if (characterController.isGrounded) {
+        else if (playerMovementData.isGrounded) {
             movementState = MovementState.Run;
-            moveSpeed = runSpeed;
+            moveSpeed = playerMovementData.runSpeed;
         }
     }
 
     private void ControlAnimator() {
+
 
         switch (movementState) {
             case MovementState.Run: {
@@ -123,29 +106,30 @@ public class CharacterMovement : MonoBehaviour {
         }
         animator.SetFloat("VelocityX", animationX, 1f, Time.deltaTime * 10f);
         animator.SetFloat("VelocityZ", animationZ, 1f, Time.deltaTime * 10f);
+        animator.SetBool("isGrounded", playerMovementData.isGrounded);
     }
 
     private void HandleAnimatorMovementData(float edgeValue) {
         if (input.z > 0.1f && animationZ < edgeValue) {
-            animationZ += animationSwitchSpeed * Time.deltaTime;
+            animationZ += playerMovementData.animationSwitchSpeed * Time.deltaTime;
             if (animationZ > edgeValue) {
                 animationZ = edgeValue;
             }
         }
         if (input.z < 0.1f && animationZ > -edgeValue) {
-            animationZ -= animationSwitchSpeed * Time.deltaTime;
+            animationZ -= playerMovementData.animationSwitchSpeed * Time.deltaTime;
             if (animationZ < -edgeValue) {
                 animationZ = -edgeValue;
             }
         }
         if (input.x > 0.1f && animationX < edgeValue) {
-            animationX += animationSwitchSpeed * Time.deltaTime;
+            animationX += playerMovementData.animationSwitchSpeed * Time.deltaTime;
             if (animationX > edgeValue) {
                 animationX = edgeValue;
             }
         }
         if (input.x < 0.1f && animationX > -edgeValue) {
-            animationX -= animationSwitchSpeed * Time.deltaTime;
+            animationX -= playerMovementData.animationSwitchSpeed * Time.deltaTime;
             if (animationX < -edgeValue) {
                 animationX = -edgeValue;
             }
@@ -158,12 +142,13 @@ public class CharacterMovement : MonoBehaviour {
         }
 
         if (animationX > edgeValue) {
-            animationX -= animationSwitchSpeed * Time.deltaTime;
+            animationX -= playerMovementData.animationSwitchSpeed * Time.deltaTime;
         }
         if (animationZ > edgeValue) {
-            animationZ -= animationSwitchSpeed * Time.deltaTime;
+            animationZ -= playerMovementData.animationSwitchSpeed * Time.deltaTime;
         }
     }
+
 
     private enum MovementState {
         Walk,

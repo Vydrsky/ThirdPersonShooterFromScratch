@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ModelFadeInOut : MonoBehaviour {
 
@@ -9,7 +10,7 @@ public class ModelFadeInOut : MonoBehaviour {
     [SerializeField] private Transform headTransform;
     private Color invisible;
     private Color materialColor;
-    
+
     /************************ INITIALIZE ************************/
     private void Awake() {
         mainCamera = Camera.main;
@@ -17,7 +18,6 @@ public class ModelFadeInOut : MonoBehaviour {
 
     private void Start() {
         materialColor = meshRenderer.material.color;
-        invisible = materialColor;
         invisible.a = 0;
     }
 
@@ -26,6 +26,7 @@ public class ModelFadeInOut : MonoBehaviour {
         float distance = Vector3.Distance(headTransform.position, mainCamera.transform.position);
         if (distance < 1f) {
             meshRenderer.material.color = invisible;
+
         }
         else {
             meshRenderer.material.color = materialColor;
@@ -33,6 +34,5 @@ public class ModelFadeInOut : MonoBehaviour {
     }
 
     /************************ METHODS ************************/
-    
-    
+
 }
