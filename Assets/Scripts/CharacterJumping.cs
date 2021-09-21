@@ -1,10 +1,11 @@
 using UnityEngine;
 
+[SelectionBase]
 public class CharacterJumping : MonoBehaviour {
 
     /************************ FIELDS ************************/
 
-    [SerializeField] private PlayerMovementDataSO playerMovementData;
+    private PlayerMovementDataSO playerMovementData;
     [SerializeField] private Transform groundCheckPosition;
     private CharacterController characterController;
     private Animator animator;
@@ -14,6 +15,7 @@ public class CharacterJumping : MonoBehaviour {
     private void Awake() {
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
+        playerMovementData = (PlayerMovementDataSO)Resources.Load("PlayerMovementData");
     }
 
 

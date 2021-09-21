@@ -12,11 +12,12 @@ public class PlayerMovementDataSO : ScriptableObject {
     public float animationSwitchSpeed = 3f;
     public float aimDuration = 0.3f;
     public float jumpTimerMax = 1f;
-    public LayerMask groundMask;
-    public Vector3 gravityVector;
-    public bool isGrounded = false;
-    public bool jumpPressed = false;
+    [HideInInspector] public LayerMask groundMask;
+    [HideInInspector] public Vector3 gravityVector;
+    [HideInInspector] public bool isGrounded = false;
+    [HideInInspector] public bool jumpPressed = false;
     public float jumpTimer;
+    [Header("Player Movement KeyBindings")]
     public KeyCode walkButton = KeyCode.LeftAlt;
     public KeyCode sprintButton = KeyCode.LeftShift;
     public KeyCode jumpButton = KeyCode.Space;

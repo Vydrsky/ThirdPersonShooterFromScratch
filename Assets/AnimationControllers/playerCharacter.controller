@@ -13,7 +13,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 3
     m_ConditionEvent: VelocityY
-    m_EventTreshold: -2
+    m_EventTreshold: -6
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -4332350971363300171}
   m_Solo: 0
@@ -590,7 +590,7 @@ AnimatorStateTransition:
     m_EventTreshold: 0
   - m_ConditionMode: 4
     m_ConditionEvent: VelocityY
-    m_EventTreshold: -2
+    m_EventTreshold: -6
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 650383196117839585}
   m_Solo: 0
@@ -641,16 +641,16 @@ AnimatorStateMachine:
     m_Position: {x: 350, y: 130, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 813923650981197264}
-    m_Position: {x: 640, y: -40, z: 0}
+    m_Position: {x: 680, y: -30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -5235641151422026001}
-    m_Position: {x: 660, y: 210, z: 0}
+    m_Position: {x: 440, y: 360, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -4332350971363300171}
-    m_Position: {x: 930, y: 100, z: 0}
+    m_Position: {x: 980, y: 120, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 650383196117839585}
-    m_Position: {x: 930, y: 30, z: 0}
+    m_Position: {x: 970, y: 360, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []

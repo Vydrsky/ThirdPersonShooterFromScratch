@@ -20,14 +20,14 @@ MonoBehaviour:
   moveRigidbodiesForceAmplification: 30
   animationSwitchSpeed: 3
   aimDuration: 0.3
-  jumpTimerMax: 0.3
+  jumpTimerMax: 0.5
   groundMask:
     serializedVersion: 2
     m_Bits: 512
   gravityVector: {x: 0, y: 0, z: 0}
   isGrounded: 1
   jumpPressed: 0
-  jumpTimer: 1.1044693
+  jumpTimer: 1.1487967
   walkButton: 120
   sprintButton: 304
   jumpButton: 32
